@@ -1,13 +1,174 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>grabbelton-nieuwjaar</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>De Nieuwjaar Grabbeldoos!</title>
+    <style>
+        /* Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: white;
+            color: #222;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* App container */
+        .app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        input {
+            text-align: center;
+            background-color: ghostwhite;
+            border-radius: 1rem;
+            padding: 0.2rem;
+            border: #222222 solid 1px;
+            font-size: 1.2rem;
+            min-height: 3em;
+            margin-bottom: 5rem;
+        }
+
+        /* Rule text */
+        .rule {
+            background-color: ghostwhite;
+            border-radius: 1rem;
+            padding: 2rem;
+            border: #222222 solid 2px;
+            font-size: 1.5rem;
+            max-width: 500px;
+            min-height: 3em;
+        }
+
+        /* Button */
+        button {
+            background-color: #ffcc66;
+            color: #3a2a00;
+            border: none;
+            padding: 1rem 1.6rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #d9a441;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        button:hover {
+            transform: translateY(2px);
+            box-shadow: 0 4px 0 #d9a441;
+        }
+
+        button:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 #d9a441;
+        }
+
+        /* Cardboard box graphic */
+        .box {
+            margin-top: 1rem;
+            position: relative;
+            width: 140px;
+        }
+
+        .box-lid {
+            height: 30px;
+            background: #deb887;
+            border-radius: 6px 6px 0 0;
+            transform: rotate(-10deg);
+        }
+
+        .box-body {
+            height: 90px;
+            background: #d2a679;
+            border-radius: 0 0 8px 8px;
+            border: 3px solid #b8895b;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <h1>De nieuwjaar grabbeldoos!</h1>
+    <p>Pak een regel uit de grabbeldoos. Je <strong>MOET</strong> je aan deze regel houden. Als iemand je betrapt dat je dat niet doet moet je een biertje atten of een shot nemen.</p>
+
+    <h2>Deze regel is voor:</h2>
+    <input type="text" id="nameInput" placeholder="naam">
+
+    <p class="rule" id="ruleDisplay"></p>
+
+    <button onclick="getRandomRule()">
+        🎲 Pak een regel uit de grabbeldoos!
+    </button>
+
+    <div class="box">
+        <div class="box-lid"></div>
+        <div class="box-body"></div>
+    </div>
+</div>
+
+<script>
+	const rules = {
+		"1": "Neem 2 shots achter elkaar terwijl minstens 3 mensen toekijken.",
+		"2": "Geef net voordat we het nieuwe jaar in gaan een dramatische speech alsof je een Oscar wint.",
+		"3": "Kies een drinkmaatje! Elke keer als jij of de ander een shotje neem of gaat atten moet nemen doen jullie dat allebei doen",
+		"4": "DE WILDCARD! Iedereen die ervoor open staat neemt een punt keta ergens op de avond. Je mag nog een regel kiezen.",
+		"5": "Jij mag dit vanavond 3 shots uitdelen aan personen naar keuze. (mag ook alle 3 dezelfde persoon zijn)",
+		"6": "Als jij 3 keer in je handen klapt moet iedereen die daarbij is een shot nemen. (Dit mag je maar 1x doen.)",
+		"8": "Elke keer als jij gaat atten moet je eerst een leuke quote zeggen. (Maakt niet uit wat voor quote)",
+		"9": "Vertel het verhaal van de tosti. Als die voor iemand bekend klinkt dan moeten jullie allebei een shot.",
+		"10": "Je moet de hele avond je linker hand gebruiken om te drinken.",
+		"11": "Kies een random object in het huis en doe een mini-toespraak alsof het de belangrijkste uitvinding van het jaar was.",
+		"12": "Elke keer als je naar de wc gaat, moet je aan iemand anders vragen of je toestemming hebt. Bij weigering van die persoon: allebei een shot. Dezelfde persoon mag niet 2x weigeren",
+		"13": "Je moet de hele avond je rechter hand gebruiken om te drinken.",
+		"14": "Je mag het woord 'bier' of een variatie daarvan niet meer zeggen",
+		"15": "Doe een staredown met iemand naar keuze. De eerste die knippert of lacht neemt een shot",
+		"16": "Telkens als iemand het woord 'drinken' in een normale zin zegt dan moet je een shot nemen.",
+		"17": "Koningsregel! Bedenk zelf een regel die IEDEREEN moet volgen",
+		"18": "Kies iemand die een woord voor jouw bedenkt. Als je dat woord goed spelt mag je een shot uitdelen",
+		"19": "Neem 5 slokken terwijl je op 1 been staat. Lukt dat niet? Neem een shot!",
+		"20": "Iedereen die dezelfde kleur draagt als jij neemt een shot."
+	};
+
+	const rulesArray = Object.entries(rules).map(([id, text]) => ({
+		id,
+		text
+	}));
+
+	let previousRules = [];
+	let selectedRule = null;
+
+	function getRandomRule() {
+		const availableRules = rulesArray.filter(
+			rule => !previousRules.some(prev => prev.id === rule.id)
+		);
+
+		const ruleDisplay = document.getElementById('ruleDisplay');
+
+		if (availableRules.length === 0) {
+			ruleDisplay.textContent = "De regels zijn op!";
+			return;
+		}
+
+		const randomRule = availableRules[Math.floor(Math.random() * availableRules.length)];
+
+		selectedRule = randomRule.text;
+		ruleDisplay.textContent = selectedRule;
+		previousRules.push(randomRule);
+	}
+</script>
+</body>
 </html>
